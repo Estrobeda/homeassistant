@@ -1,0 +1,122 @@
+blueprint:
+  name: Aqara Cube T1 Pro Side Action
+  description: Control anything with Aqara Cube T1 Pro, use the action_angle variable to determine the rotation.
+  domain: automation
+  input:
+    remote:
+      name: Aqara Cube T1 Pro (Required)
+      description: Select the Aqara Cube T1 device
+      selector:
+        text:
+    input_side:
+      name: Side number
+      description: The side to be used to trigger actions.
+      default: 1
+      selector:
+        number:
+          max: 6
+          min: 1
+    slide_action:
+      name: "Slide action"
+      default: []
+      selector:
+        action:
+    tap_action:
+      name: "Tap action"
+      default: []
+      selector:
+        action:
+    shake_action:
+      name: "Shake action"
+      default: []
+      selector:
+        action:
+    throw_action:
+      name: "Throw action"
+      default: []
+      selector:
+        action:
+    rotate_left_action:
+      name: "Rotate left action"
+      default: []
+      selector:
+        action:
+    rotate_right_action:
+      name: "Rotate right action"
+      default: []
+      selector:
+        action:
+    flip_to_1_action:
+      name: "Flip to side 1"
+      default: []
+      selector:
+        action:
+    flip_to_2_action:
+      name: "Flip to side 2"
+      default: []
+      selector:
+        action:
+    flip_to_3_action:
+      name: "Flip to side 3"
+      default: []
+      selector:
+        action:
+    flip_to_4_action:
+      name: "Flip to side 4"
+      default: []
+      selector:
+        action:
+    flip_to_5_action:
+      name: "Flip to side 5"
+      default: []
+      selector:
+        action:
+    flip_to_6_action:
+      name: "Flip to side 6"
+      default: []
+      selector:
+        action:
+
+trigger:
+  platform: mqtt
+  topic: !input remote
+
+condition:
+  - condition: template
+    value_template: "{{trigger.payload_json.action != '' or trigger.payload_json.action_from_side !=null}}"
+
+action:
+  - variables:
+      active_side: !input input_side
+      operation_mode: "{{trigger.payload_json.operation_mode}}"
+      side: "{{trigger.payload_json.side}}"
+      action: "{{trigger.payload_json.action}}"
+      action_from_side: "{{trigger.payload_json.action_from_side}}"
+      action_angle: "{{trigger.payload_json.action_angle}}"
+  - choose:
+      - conditions: "{{side == active_side and action == 'slide'}}"
+        sequence: !input slide_action
+      - conditions: "{{side == active_side and action == 'tap'}}"
+        sequence: !input tap_action
+      - conditions: "{{side == active_side and action == 'shake'}}"
+        sequence: !input shake_action
+      - conditions: "{{side == active_side and action == 'throw'}}"
+        sequence: !input throw_action
+      - conditions: "{{side == active_side and action == 'rotate_left'}}"
+        sequence: !input rotate_left_action
+      - conditions: "{{side == active_side and action == 'rotate_right'}}"
+        sequence: !input rotate_right_action
+      - conditions: "{{(action == 'flip90' or action == 'flip180') and action_from_side == active_side and side == 1}}"
+        sequence: !input flip_to_1_action
+      - conditions: "{{(action == 'flip90' or action == 'flip180') and action_from_side == active_side and side == 2}}"
+        sequence: !input flip_to_2_action
+      - conditions: "{{(action == 'flip90' or action == 'flip180') and action_from_side == active_side and side == 3}}"
+        sequence: !input flip_to_3_action
+      - conditions: "{{(action == 'flip90' or action == 'flip180') and action_from_side == active_side and side == 4}}"
+        sequence: !input flip_to_4_action
+      - conditions: "{{(action == 'flip90' or action == 'flip180') and action_from_side == active_side and side == 5}}"
+        sequence: !input flip_to_5_action
+      - conditions: "{{(action == 'flip90' or action == 'flip180') and action_from_side == active_side and side == 6}}"
+        sequence: !input flip_to_6_action
+mode: restart
+max_exceeded: silent
